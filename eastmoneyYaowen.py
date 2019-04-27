@@ -73,7 +73,7 @@ class Analyser(object):
     def __init__(self, s):
         self.s = s
 
-    def analyze(self):
+    def analyze(self, n):
         # 文本预处理
         pattern = re.compile(u'\t|\n|\.|-|:|;|\)|\(|\?|"')  # 定义正则表达式匹配模式
         self.s = re.sub(pattern, '', self.s)  # 将符合模式的字符去除
@@ -89,19 +89,20 @@ class Analyser(object):
 
         # # 词频统计
         word_counts = collections.Counter(list)         # 对分词做词频统计
-        word_counts_top = word_counts.most_common(20)   # 获取前10最高频的词
+        word_counts_top = word_counts.most_common(n)   # 获取前10最高频的词
         print(word_counts_top)  # 输出检查
 
 # 控制器
 class Controller(object):
 
-    def __init__(self, month, day):
+    def __init__(self, month, day, count):
         self.downloader = None              # 下载器
         self.pagemanager = PageManager()    # 页面管理器
         self.parser = None                  # 解析器
         self.analyser = None
         self.month = month
         self.day = day
+        self.count = count
 
     def get_news(self):
         uri = "http://finance.eastmoney.com/a/cgnjj_%s.html"
@@ -126,10 +127,12 @@ class Controller(object):
                 self.pagemanager.next()
                 time.sleep(random.random()*2)
         self.analyser = Analyser(s=s)
-        self.analyser.analyze()
+        self.analyser.analyze(self.count)
+
 
 if __name__ == '__main__':
-    month = '04'
-    day = '27'
-    con = Controller(month=month, day=day)
+    month = '04'        # 输入需要抓取的月份
+    day = '27'          # 输入需要抓取的日期
+    count = 20          # 需要的热点词汇数量
+    con = Controller(month=month, day=day, count=count)
     con.get_news()
